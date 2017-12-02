@@ -7,8 +7,13 @@ import (
 	"time"
 	"github.com/vcraescu/holy-internet/pkg/utils"
 	"fmt"
+	"errors"
+	"math/rand"
 )
 
+const (
+	noInternetCheckInterval = time.Second * 5
+)
 
 var (
 	startingTime time.Time
@@ -19,18 +24,25 @@ func init() {
 }
 
 func main() {
+	md := startMailerDaemon()
+
+	go forever(md)
+	select {}
+}
+
+func startMailerDaemon() (*holyinternet.MailerDaemon) {
 	mailer := holyinternet.NewMailer(
 		viper.GetString("email.host"),
 		viper.GetString("email.username"),
 		viper.GetString("email.password"),
 		viper.GetString("email.port"),
+		viper.GetBool("email.tls"),
 	)
 
 	md := holyinternet.NewMailerDaemon(mailer)
 	md.Start()
 
-	go forever(md)
-	select{}
+	return md
 }
 
 func startTimer() {
@@ -43,30 +55,92 @@ func stopTimer() (time.Duration) {
 
 func forever(md *holyinternet.MailerDaemon) {
 	saints := viper.GetStringSlice("saints")
-
 	down := false
+	defaultSleepDuration := time.Second * time.Duration(viper.GetInt("pray.every"))
+	sleepDuration := defaultSleepDuration
+
+	log.Printf("Checking The Holy Internet connection every %s...", sleepDuration)
 
 	for {
+		time.Sleep(sleepDuration)
+
 		ok := holyinternet.IsInternetOK(saints)
 		log.Printf("Internet: %v", ok)
+
 		if !ok {
 			if !down {
 				startTimer()
 				utils.NotifyCritical("Error", "Sorry! No internet for you")
 			}
 			down = true
-		} else {
-			if down {
-				down = false
-				d := stopTimer()
-				utils.NotifyCritical("Yay!", fmt.Sprintf("Internet was down for %s seconds", d))
+			sleepDuration = noInternetCheckInterval
+			continue
+		}
+
+		if down {
+			down = false
+			d := stopTimer()
+			utils.NotifyCritical("Yay!", fmt.Sprintf("Internet was down for %s seconds", d))
+			if err, _ := sendEmailToFollowers(md, d); err != nil {
+				log.Println(err)
+			}
+
+			if _, err := sendCurse(md); err != nil {
+				log.Println(err)
 			}
 		}
 
-		time.Sleep(time.Second * 5)
-		msg := holyinternet.Message{To: "viorel@wingravity.com", Body: "This is a test"}
+		sleepDuration = defaultSleepDuration
+	}
+}
+
+func sendEmailToFollowers(md *holyinternet.MailerDaemon, d time.Duration) (error, int) {
+	emails := viper.GetStringSlice("followers.people")
+	if len(emails) == 0 {
+		return errors.New("no followers found"), 0
+	}
+
+	count := 0
+	for _, email := range emails {
+		msg := holyinternet.Message{
+			Subject: "Internet was down",
+			From:    viper.GetString("email.username"),
+			Body:    fmt.Sprintf(viper.GetString("followers.message"), d),
+			To:      email,
+		}
+
 		if err := md.Send(msg); err != nil {
 			log.Println(err)
 		}
+
+		count++
 	}
+
+	return nil, count
+}
+
+func sendCurse(md *holyinternet.MailerDaemon) (bool, error) {
+	messages := viper.GetStringSlice("curses.messages")
+	if len(messages) == 0 {
+		return false, errors.New("no curse messages found")
+	}
+
+	target := viper.GetString("curses.target")
+	if target == "" {
+		return false, errors.New("curse target not defined")
+	}
+
+	index := rand.Intn(len(messages))
+	msg := holyinternet.Message{
+		Subject: "Internet was down",
+		From:    viper.GetString("email.username"),
+		Body:    messages[index],
+		To:      target,
+	}
+
+	if err := md.Send(msg); err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

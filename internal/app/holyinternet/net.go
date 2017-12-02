@@ -28,7 +28,7 @@ func pingHosts(hosts []string) (bool) {
 
 func pickHosts(hosts []string) []string {
 	hc := viper.GetInt("pray.count")
-	if len(hosts) < hc  {
+	if len(hosts) < hc {
 		hc = len(hosts)
 	}
 

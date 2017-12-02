@@ -6,9 +6,10 @@ import (
 )
 
 const (
-	appName = "holy-internet"
-	checkIntervalInSeconds = 3
-	checkHostsCount = 3
+	appName                = "holy-internet"
+	checkIntervalInSeconds = 5
+	checkHostsCount        = 3
+	version                = 0.1
 )
 
 var configPaths = []string{
@@ -21,6 +22,7 @@ func ReadConfig() {
 	viper.SetConfigName("config")
 	viper.SetDefault("pray.every", checkIntervalInSeconds)
 	viper.SetDefault("pray.count", checkHostsCount)
+	viper.SetDefault("version", version)
 
 	for _, path := range configPaths {
 		viper.AddConfigPath(path)
