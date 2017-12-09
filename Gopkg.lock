@@ -15,6 +15,60 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/getlantern/context"
+  packages = ["."]
+  revision = "624d99b1798d7c5375ea1d3ca4c5b04d58f7c775"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/getlantern/errors"
+  packages = ["."]
+  revision = "e9c0296368b736086adb20832549567064224854"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/getlantern/filepersist"
+  packages = ["."]
+  revision = "c5f0cd24e7991579ba6f5f1bd20a1ad2c9f06cd4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/getlantern/golog"
+  packages = ["."]
+  revision = "cca714f7feb5df8e455f409b549d384441ac4578"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/getlantern/hex"
+  packages = ["."]
+  revision = "083fba3033ad473db3dd31c9bb368473d37581a7"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/getlantern/hidden"
+  packages = ["."]
+  revision = "d52a649ab33af200943bb599898dbdcfdbc94cb7"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/getlantern/ops"
+  packages = ["."]
+  revision = "37353306c90844c8e0591956f56611f46299d202"
+
+[[projects]]
+  name = "github.com/getlantern/stack"
+  packages = ["."]
+  revision = "ac4c579c437a23e1a15814c867ccb82122fb383b"
+  version = "v1.5.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/getlantern/systray"
+  packages = ["."]
+  revision = "fc8e01480deb4dc92e7f13151536a9678520ff42"
+
+[[projects]]
+  branch = "master"
   name = "github.com/hashicorp/hcl"
   packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
   revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
@@ -30,6 +84,12 @@
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
   revision = "06020f85339e21b2478f756a78e295255ffa4d6a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/oxtoacart/bpool"
+  packages = ["."]
+  revision = "4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
@@ -88,6 +148,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "95d7929b6ddb66d8d1f485e2570f9ac1d0caa1e85d846588bd76ea9f6f670753"
+  inputs-digest = "4554182ed55e14a50c08bf47fdb1656ab5e7de70ae8b7c9f25e155f1abf21a5c"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -25,9 +25,58 @@ func init() {
 
 func main() {
 	md := startMailerDaemon()
+	app := holyinternet.NewApp(md)
+	app.Run(onReady, onExit)
+}
 
-	go forever(md)
-	select {}
+func onReady(app *holyinternet.App) {
+	saints := viper.GetStringSlice("saints")
+	down := false
+	defaultSleepDuration := time.Second * time.Duration(viper.GetInt("pray.every"))
+	sleepDuration := defaultSleepDuration
+
+	log.Printf("Checking The Holy Internet connection every %s...", sleepDuration)
+
+	for {
+		time.Sleep(sleepDuration)
+		if app.IsPaused() {
+			continue
+		}
+
+		ok := holyinternet.IsInternetOK(saints)
+		log.Printf("Internet: %v", ok)
+
+		if !ok {
+			if !down {
+				startTimer()
+				utils.NotifyCritical("Error", "Sorry! No internet for you")
+			}
+			down = true
+			sleepDuration = noInternetCheckInterval
+			app.Failed()
+			continue
+		}
+
+		if down {
+			app.DiscardFailure()
+			down = false
+			d := stopTimer()
+			utils.NotifyCritical("Yay!", fmt.Sprintf("Internet was down for %s seconds", d))
+			if err, _ := sendEmailToFollowers(app.MailerDaemon, d); err != nil {
+				log.Println(err)
+			}
+
+			if _, err := sendCurse(app.MailerDaemon); err != nil {
+				log.Println(err)
+			}
+		}
+
+		sleepDuration = defaultSleepDuration
+	}
+}
+
+func onExit(app *holyinternet.App) {
+	// clean up here
 }
 
 func startMailerDaemon() (*holyinternet.MailerDaemon) {
@@ -51,47 +100,6 @@ func startTimer() {
 
 func stopTimer() (time.Duration) {
 	return time.Duration(time.Since(startingTime))
-}
-
-func forever(md *holyinternet.MailerDaemon) {
-	saints := viper.GetStringSlice("saints")
-	down := false
-	defaultSleepDuration := time.Second * time.Duration(viper.GetInt("pray.every"))
-	sleepDuration := defaultSleepDuration
-
-	log.Printf("Checking The Holy Internet connection every %s...", sleepDuration)
-
-	for {
-		time.Sleep(sleepDuration)
-
-		ok := holyinternet.IsInternetOK(saints)
-		log.Printf("Internet: %v", ok)
-
-		if !ok {
-			if !down {
-				startTimer()
-				utils.NotifyCritical("Error", "Sorry! No internet for you")
-			}
-			down = true
-			sleepDuration = noInternetCheckInterval
-			continue
-		}
-
-		if down {
-			down = false
-			d := stopTimer()
-			utils.NotifyCritical("Yay!", fmt.Sprintf("Internet was down for %s seconds", d))
-			if err, _ := sendEmailToFollowers(md, d); err != nil {
-				log.Println(err)
-			}
-
-			if _, err := sendCurse(md); err != nil {
-				log.Println(err)
-			}
-		}
-
-		sleepDuration = defaultSleepDuration
-	}
 }
 
 func sendEmailToFollowers(md *holyinternet.MailerDaemon, d time.Duration) (error, int) {

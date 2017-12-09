@@ -9,7 +9,7 @@ const (
 	appName                = "holy-internet"
 	checkIntervalInSeconds = 5
 	checkHostsCount        = 3
-	version                = 0.1
+	version                = 0.2
 )
 
 var configPaths = []string{
