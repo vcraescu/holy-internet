@@ -8,8 +8,25 @@ import (
 
 type App struct {
 	MailerDaemon *MailerDaemon
-	pause bool
-	errorCh chan bool
+	pause        bool
+	errorCh      chan bool
+}
+
+type pauseMenuItem struct {
+	*systray.MenuItem
+	state bool
+}
+
+func (item *pauseMenuItem) Toggle() {
+	item.state = !item.state
+	if item.state {
+		item.SetTitle("Resume")
+		item.SetTooltip("Resume your prayings")
+		return
+	}
+
+	item.SetTitle("Pause")
+	item.SetTooltip("Pause your prayings")
 }
 
 func (a *App) Pause() {
@@ -44,7 +61,14 @@ func (a *App) Run(onReady func(app *App), onExit func(app *App)) {
 func onAppReady(a *App) {
 	systray.SetIcon(icon.HolyActive)
 	systray.SetTooltip("Holy Internet")
-	mPause := systray.AddMenuItem("Pause", "Pause your praying")
+
+	mPause := &pauseMenuItem{
+		MenuItem: systray.AddMenuItem("", ""),
+		state:    true,
+	}
+
+	mPause.Toggle()
+
 	systray.AddSeparator()
 	mQuit := systray.AddMenuItem("Quit", "Do something with your life")
 
@@ -57,14 +81,14 @@ func onAppReady(a *App) {
 				if a.IsPaused() {
 					log.Println("Resumed")
 					a.Resume()
-					mPause.Uncheck()
+					mPause.Toggle()
 					systray.SetIcon(icon.HolyActive)
 					break
 				}
 
 				log.Println("Paused")
 				a.Pause()
-				mPause.Check()
+				mPause.Toggle()
 				systray.SetIcon(icon.HolyPaused)
 			case err := <-a.errorCh:
 				if err {

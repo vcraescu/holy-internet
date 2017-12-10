@@ -61,7 +61,7 @@ func onReady(app *holyinternet.App) {
 			app.DiscardFailure()
 			down = false
 			d := stopTimer()
-			utils.NotifyCritical("Yay!", fmt.Sprintf("Internet was down for %s seconds", d))
+			utils.NotifyNormal("Yay!", fmt.Sprintf("Internet was down for %s seconds", d))
 			if err, _ := sendEmailToFollowers(app.MailerDaemon, d); err != nil {
 				log.Println(err)
 			}
@@ -76,7 +76,7 @@ func onReady(app *holyinternet.App) {
 }
 
 func onExit(app *holyinternet.App) {
-	// clean up here
+	log.Println("Exit")
 }
 
 func startMailerDaemon() (*holyinternet.MailerDaemon) {
