@@ -5,7 +5,7 @@ import (
 	"github.com/vcraescu/holy-internet/internal/app/holyinternet"
 	"log"
 	"time"
-	"github.com/vcraescu/holy-internet/pkg/utils"
+	"github.com/vcraescu/holy-internet/internal/pkg/util"
 	"fmt"
 	"errors"
 	"math/rand"
@@ -49,7 +49,7 @@ func onReady(app *holyinternet.App) {
 		if !ok {
 			if !down {
 				startTimer()
-				utils.NotifyCritical("Error", "Sorry! No internet for you")
+				util.NotifyCritical("Error", "Sorry! No internet for you")
 			}
 			down = true
 			sleepDuration = noInternetCheckInterval
@@ -61,7 +61,7 @@ func onReady(app *holyinternet.App) {
 			app.DiscardFailure()
 			down = false
 			d := stopTimer()
-			utils.NotifyCritical("Yay!", fmt.Sprintf("Internet was down for %s seconds", d))
+			util.NotifyNormal("Yay!", fmt.Sprintf("Internet was down for %s seconds", d))
 			if err, _ := sendEmailToFollowers(app.MailerDaemon, d); err != nil {
 				log.Println(err)
 			}
@@ -76,7 +76,7 @@ func onReady(app *holyinternet.App) {
 }
 
 func onExit(app *holyinternet.App) {
-	// clean up here
+	log.Println("Exit")
 }
 
 func startMailerDaemon() (*holyinternet.MailerDaemon) {

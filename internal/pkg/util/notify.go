@@ -1,4 +1,4 @@
-package utils
+package util
 
 import (
 	"github.com/0xAX/notificator"
@@ -10,4 +10,8 @@ var n = notificator.New(notificator.Options{
 
 func NotifyCritical(title, text string) {
 	n.Push(title, text, "", notificator.UR_CRITICAL)
+}
+
+func NotifyNormal(title, text string) {
+	n.Push(title, text, "", notificator.UR_NORMAL)
 }
