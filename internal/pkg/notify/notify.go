@@ -1,4 +1,4 @@
-package util
+package notify
 
 import (
 	"github.com/0xAX/notificator"
@@ -8,10 +8,10 @@ var n = notificator.New(notificator.Options{
 	AppName: "Holy Internet",
 })
 
-func NotifyCritical(title, text string) {
+func Critical(title, text string) {
 	n.Push(title, text, "", notificator.UR_CRITICAL)
 }
 
-func NotifyNormal(title, text string) {
+func Normal(title, text string) {
 	n.Push(title, text, "", notificator.UR_NORMAL)
 }

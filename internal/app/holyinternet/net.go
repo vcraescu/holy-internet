@@ -1,17 +1,17 @@
 package holyinternet
 
 import (
-	"github.com/vcraescu/holy-internet/internal/pkg/util"
 	"log"
 	"math/rand"
 	"time"
 	"github.com/spf13/viper"
+	"github.com/vcraescu/holy-internet/internal/pkg/net"
 )
 
 func pingHosts(hosts []string) (bool) {
 	failures := 0
 	for _, host := range hosts {
-		ok, err := util.Ping(host)
+		ok, err := net.Ping(host)
 		if ok {
 			continue
 		}
